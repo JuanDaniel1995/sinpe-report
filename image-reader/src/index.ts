@@ -1,9 +1,9 @@
-import express from 'express';
-import { json } from 'body-parser';
+import { app } from './app';
 
-const app = express();
-app.use(json());
+const start = async () => {
+  app.listen(3001, () => {
+    console.log('Listening on port 3001!!!!');
+  });
+}
 
-app.listen(3000, () => {
-  console.log('listening on port 3000!');
-});
+start();
