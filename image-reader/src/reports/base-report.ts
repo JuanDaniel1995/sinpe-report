@@ -1,4 +1,5 @@
-import * as dialogflow from '@google-cloud/dialogflow';
+import * as dialogflowTypes from '@google-cloud/dialogflow/build/protos/protos';
+import { SessionsClient } from '@google-cloud/dialogflow/build/src'
 
 import { Delimiters } from './delimiters';
 
@@ -9,10 +10,10 @@ interface Data {
 
 export abstract class BaseReport<T extends Data> {
   abstract delimiter: T['delimiter'];
-  abstract extractInfo(queryResult: dialogflow.protos.google.cloud.dialogflow.v2.IQueryResult | null | undefined): T['data'];
+  abstract extractInfo(queryResult: dialogflowTypes.google.cloud.dialogflow.v2.IQueryResult | null | undefined): T['data'];
   protected sentence: string = '';
 
-  constructor(private sessionId: string, private projectId: string, private sessionClient: dialogflow.SessionsClient, private sessionPath: string) {
+  constructor(private sessionId: string, private projectId: string, private sessionClient: SessionsClient, private sessionPath: string) {
     this.sessionPath = this.sessionClient.projectAgentSessionPath(
       this.projectId,
       this.sessionId
@@ -23,8 +24,8 @@ export abstract class BaseReport<T extends Data> {
     this.sentence = sentence;
   }
 
-  async sendRequest(previousIntentContexts?: dialogflow.protos.google.cloud.dialogflow.v2.IContext[] | null | undefined): Promise<dialogflow.protos.google.cloud.dialogflow.v2.IQueryResult | null | undefined> {
-    const request: dialogflow.protos.google.cloud.dialogflow.v2.IDetectIntentRequest = {
+  async sendRequest(previousIntentContexts?: dialogflowTypes.google.cloud.dialogflow.v2.IContext[] | null | undefined): Promise<dialogflowTypes.google.cloud.dialogflow.v2.IQueryResult | null | undefined> {
+    const request: dialogflowTypes.google.cloud.dialogflow.v2.IDetectIntentRequest = {
       session: this.sessionPath,
       queryInput: {
         text: {
