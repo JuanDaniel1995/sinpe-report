@@ -56,60 +56,35 @@ router.post('/api/image', async (req: Request, res: Response) => {
       },
     };
     const response = await sessionClient.detectIntent(request);
-    console.log(response[0].queryResult?.intent?.displayName);
     if (response[0].queryResult?.intent?.displayName === 'report_payment_debited_info_bn') {
       const bnDebit = new BNDebit(sessionId, projectId, sessionClient, sessionPath);
       const bnCredit = new BNCredit(sessionId, projectId, sessionClient, sessionPath);
       const bnClient = new BN(bnDebit, bnCredit);
       const bnParams = await bnClient.extractInfo(textDetections.fullTextAnnotation?.text);
       queryParams = { ...queryParams, ...bnParams };
-      console.log(queryParams);
     } else if (response[0].queryResult?.intent?.displayName === 'report_sinpe_movil_payment_debited_info_bn') {
       const bnSinpeDebit = new BNSinpeDebit(sessionId, projectId, sessionClient, sessionPath);
       const bnSinpeCredit = new BNSinpeCredit(sessionId, projectId, sessionClient, sessionPath);
       const bnClient = new BN(bnSinpeDebit, bnSinpeCredit);
       const bnParams = await bnClient.extractInfo(textDetections.fullTextAnnotation?.text);
       queryParams = { ...queryParams, ...bnParams };
-      console.log(queryParams);
     } else if (response[0].queryResult?.intent?.displayName === 'report_payment_header_info_bac') {
       const bacHeader = new BACHeader(sessionId, projectId, sessionClient, sessionPath);
       const bacBody = new BACBody(sessionId, projectId, sessionClient, sessionPath);
       const bacClient = new BAC(bacHeader, bacBody);
       const bacParams = await bacClient.extractInfo(textDetections.fullTextAnnotation?.text);
       queryParams = { ...queryParams, ...bacParams };
-      console.log(queryParams);
     } else if (response[0].queryResult?.intent?.displayName === 'report_sinpe_movil_payment_header_info_bac') {
       const bacSinpeHeader = new BACSinpeHeader(sessionId, projectId, sessionClient, sessionPath);
       const bacSinpeBody = new BACSinpeBody(sessionId, projectId, sessionClient, sessionPath);
       const bacClient = new BAC(bacSinpeHeader, bacSinpeBody);
       const bacParams = await bacClient.extractInfo(textDetections.fullTextAnnotation?.text);
       queryParams = { ...queryParams, ...bacParams };
-      console.log(queryParams);
-    }
-
-
-
-    // console.log(response[0].queryResult?.intent?.displayName);
-    // if (textDetections.fullTextAnnotation?.text?.includes('Transferencia BN SINPE')) {
-    //   const bnSinpeDebit = new BNSinpeDebit(sessionId, projectId, sessionClient, sessionPath);
-    //   const bnSinpeCredit = new BNSinpeCredit(sessionId, projectId, sessionClient, sessionPath);
-    //   const bnClient = new BN(bnSinpeDebit, bnSinpeCredit);
-    //   const bnParams = await bnClient.extractInfo(textDetections.fullTextAnnotation?.text);
-    //   queryParams = { ...queryParams, ...bnParams };
-    //   console.log(queryParams);
-    // } else if (textDetections.fullTextAnnotation?.text?.includes('Banco Nacional de Costa Rica')) {
-    //   const bnDebit = new BNDebit(sessionId, projectId, sessionClient, sessionPath);
-    //   const bnCredit = new BNCredit(sessionId, projectId, sessionClient, sessionPath);
-    //   const bnClient = new BN(bnDebit, bnCredit);
-    //   const bnParams = await bnClient.extractInfo(textDetections.fullTextAnnotation?.text);
-    //   queryParams = { ...queryParams, ...bnParams };
-    //   console.log(queryParams);
-    // }
+    } else throw new Error('Image not recognized');
+    return res.send(queryParams);
   } catch (err) {
-    console.log(err);
     return res.status(400).send({});
   }
-  res.send({});
 });
 
 export { router as indexImageRouter };
