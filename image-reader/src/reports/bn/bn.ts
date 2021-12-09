@@ -18,9 +18,10 @@ export class BN {
   }
 
   async extractInfo(fullText: string) {
-    const splittedText = fullText.split(this.debitReportInfo.delimiter);
-    this.debitReportInfo.assignSentence(splittedText[0]);
-    this.creditReportInfo.assignSentence(splittedText[1]);
+    const regex = new RegExp(`(${this.debitReportInfo.delimiter})`)
+    const splittedText = fullText.split(regex);
+    this.debitReportInfo.assignSentence(`${splittedText[0]}${splittedText[1]}`);
+    this.creditReportInfo.assignSentence(splittedText[2]);
     const queryParamsDebit = await this.extractParams(this.debitReportInfo);
     const creditParamsDebit = await this.extractParams(this.creditReportInfo);
     return { ...queryParamsDebit, ...creditParamsDebit };
@@ -29,7 +30,7 @@ export class BN {
   private async extractParams(report: BNDebit | BNSinpeDebit | BNCredit | BNSinpeCredit) {
     report.cleanSentence(this.bankAccountFormatter, this.bankAccountOrder);
     report.cleanSentence(this.ibanBankAccountFormatter, this.ibanBankAccountOrder);
-    const debitedRequest = await report.sendRequest();
-    return report.extractInfo(debitedRequest);
+    const request = await report.sendRequest();
+    return report.extractInfo(request);
   }
 }
